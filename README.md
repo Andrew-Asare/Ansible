@@ -65,3 +65,5 @@ Ansible is a push type configuration management tool
 - Each play has a list of tasks
 - - Each element in list of tasks given a name
 - - Followed by instructions to execute the task
+![image](https://user-images.githubusercontent.com/26543682/117183712-c8955f00-adcf-11eb-9e41-06cb82a27945.png)
+
