@@ -67,3 +67,24 @@ Ansible is a push type configuration management tool
 - - Followed by instructions to execute the task
 ![image](https://user-images.githubusercontent.com/26543682/117183712-c8955f00-adcf-11eb-9e41-06cb82a27945.png)
 
+## Ad-hoc Commands
+Adhoc commands can be used to run commands in other servers from the Ansible controller.
+
+- ssh vagrant@server_ip - SSH into another vagrant machine
+- hosts file holds info to configure with the other servers (stored in /etc/ansible directory)
+- Adding a web host in the hosts file:
+` [web]
+192.168.33.10 ansible_connection=ssh ansible_ssh_user=vagrant ansible_ssh_pass=vagrant `
+## Commands for Ansible
+` ansible web -m ping `- ping into the web server
+` ansible all -m ping ` - ping all the machines
+` ansible web -a "uname -a" ` - find out machince
+` ansible web -a "date" `- find out date on web server
+` ansible web -m shell -a "ls -a" ` - list all files in web server
+` sudo nano hosts ` - This lets us edit the host file with admin permissions
+## Playbooks
+- Playbooks are configuration files used to run commands that are often used.
+- Same location as the hosts file (/etc/ansible)
+- Indentation is VERY important when using Ansible
+## Making playbook files:
+` sudo nano install_nginx.yml ` - we use this command to create a YAML file, in this case we are installing Nginx `ansible-playbook install_nginx.yml` - run the YAML file
