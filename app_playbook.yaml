@@ -1,5 +1,3 @@
-  GNU nano 2.9.3                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 node_app_playbook.yml
-
 # node_app_playbook.yml
 # This is a YAML file to install node-app onto our web using YAML
 ---
