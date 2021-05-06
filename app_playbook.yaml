@@ -1,91 +1,164 @@
-# Example Playbook written in YAML
+  GNU nano 2.9.3                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 node_app_playbook.yml
 
-# YAML Playbook file starts with three dashes
-
+# node_app_playbook.yml
+# This is a YAML file to install node-app onto our web using YAML
 ---
 
-# Example targeting host
-- name: Set up App Host
-  hosts: localhost
 
-# used to define where this playbook will run
 
-  gather_facts: yes
-# gathers facts/state of machine before running playbook
 
-  become: true
-# become is used to get root permission to perform tasks that may require admin access
+  - name: start mongodb
+    import_playbook: mongodb_setup.yml
 
-  vars:
-    ip_db:
-      DB_HOST: 192.168.33.11
 
-  environment: "{{ ip_db }}"
 
-  tasks:
-  - name: Update apt-get
-    apt:
-      update_cache: yes
-      force_apt_get: yes
 
-  - name: Installing git
-    apt:
-      name: git
-      state: present
+# where do we want to install
 
-  - name: Installing nginx
-    apt:
-      name: nginx
-      state: present
 
-  - name: Synchronise app folder
-    synchronize:
-      src: /home/ubuntu/app
-      dest: /home/ubuntu/
-      recursive: yes
 
-  - name: Synchronise nginx config folder
-    synchronize:
-      src: /home/ubuntu/nginx_config
-      dest: /home/ubuntu/
-      recursive: yes
+# tasks:
+  - name: Install nginx
+    import_playbook: nginx_setup.yml
 
-  - name: Curl nodejs source
-    shell: curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
 
-  - name: Install nodejs
-    apt:
-      pkg: nodejs
-      state: present
 
-  - name: Installing pm2 with npm
+
+# Install node js and NPM
+
+
+
+  - hosts: web
+    gather_facts: true
+    become: true
+
+
+
+
+
+  - tasks:
+    - name: Install nodejs
+      apt: pkg=nodejs state=present
+
+
+
+  - name: Install NPM
+    apt: pkg=npm state=present
+
+
+
+  - name: download latest npm + Mongoose
+    shell: |
+       npm install -g npm@latest
+       npm install mongoose -y
+# Downloading pm2
+  - name: Install pm2
     npm:
-      name: pm2
-      global: yes
+    name: pm2
+    global: yes
 
-  - name: Remove default nginx config
-    file:
-      path: /etc/nginx/sites-available/default
-      state: absent
 
-  - name: Copy new nginx config
-    copy:
-      src: /home/ubuntu/nginx_config/proxy_config.conf
-      dest: /etc/nginx/sites-available/default
 
-  - name: Restart nginx
-    service:
-      name: nginx
-      state: restarted
-      enabled: yes
 
-  - name: Export DB_HOST environment variable
-    shell: echo "export DB_HOST=172.31.38.233" >> ~/.bashrc
+  - name: seed + run app
+    shell: |
+       cd app/
+       npm install
+       node seeds/seed.js
+       pm2 kill
+       pm2 start app.js
+    environment:
+# This is where you enter the environment variable to tell the app where to look for the db
+    DB_HOST: mongodb://ubuntu@<192.168.33.11>:27017/posts?authSource=admin
+    become_user: root
 
-  - name: npm install all packages for app
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# node_app_playbook.yml
+# This is a YAML file to install node-app onto our web using YAML
+---
+
+
+
+
+  - name: start mongodb
+    import_playbook: mongodb_setup.yml
+
+
+
+
+# where do we want to install
+
+
+
+# tasks:
+  - name: Install nginx
+    import_playbook: nginx_setup.yml
+
+
+
+
+# Install node js and NPM
+
+
+
+  - hosts: web
+    gather_facts: true
+    become: true
+
+
+
+
+
+  - tasks:
+    - name: Install nodejs
+      apt: pkg=nodejs state=present
+
+
+
+  - name: Install NPM
+    apt: pkg=npm state=present
+
+
+
+  - name: download latest npm + Mongoose
+    shell: |
+       npm install -g npm@latest
+       npm install mongoose -y
+# Downloading pm2
+  - name: Install pm2
     npm:
+    name: pm2
+    global: yes
 
-  tags: ['never', 'create_ec2']
+
+
+
+  - name: seed + run app
+    shell: |
+       cd app/
+       npm install
+       node seeds/seed.js
+       pm2 kill
+       pm2 start app.js
+    environment:
+# This is where you enter the environment variable to tell the app where to look for the db
+    DB_HOST: mongodb://ubuntu@<192.168.33.11>:27017/posts?authSource=admin
+    become_user: root
+
+
 
 
 
